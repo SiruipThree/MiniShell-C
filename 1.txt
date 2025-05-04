@@ -1,0 +1,16 @@
+/usr/bin/echo foo bar baz
+host google.com
+pwd
+ls
+cd aaa
+pwd
+cd ..
+pwd
+ls
+which touch
+ls *.txt
+ls b*txt
+echo echo helloworld > shouldOnlyContainEchoHelloWorld.txt
+./P3/mysh < shouldOnlyContainEchoHelloWorld.txt > shouldOnlyContainHelloWorld.txt
+echo echo helloworld | ./P3/mysh > out2.txt
+exit

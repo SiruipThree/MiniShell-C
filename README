@@ -1,0 +1,120 @@
+Project 3: My Shell (mysh)
+
+Overview:
+-----------------------------------------------------------------------------------------------------------------------------------
+mysh is a simple custom command-line shell written in C. It supports both interactive and batch modes and provides basic features such as executing commands, redirection, pipelines, and built-in commands. 
+
+Contributors:
+-----------------------------------------------------------------------------------------------------------------------------------
+- Sirui Peng: sp2269
+- Xing Kuang: xk29
+
+Command Parsing:
+-----------------------------------------------------------------------------------------------------------------------------------
+typedef struct {
+    char specialToken; // Special characters (|, <, >), or 0 if normal token
+    char *normalToken; // Program name or argument
+} tokenType;
+
+
+Code Structure and Implementation:
+-----------------------------------------------------------------------------------------------------------------------------------
+- Interactive Mode:
+    Prints a 'welcome' message and prompts for user input. Provides feedback for command execution, including errors and abnormal terminations.
+
+- Batch Mode:
+    Executes commandss from a script file without any prompts or extra messages.
+
+- Built-in Commands:
+    1. cd (directory): Changes the current working directory.
+    2. pwd: Prints out the current working directory.
+    3. which [program]: Locates the directory of the program in the system's PATH.
+    4. exit: Terminates the shell and exit.
+
+- Command Execution:
+    Executes programs using execv or execve.
+    Supports absolute and relative paths for executables.
+
+- Redirection:
+    "<" - Redirects input from a file.
+    ">" - Redirects output to a file.
+
+- Pipelines:
+    Supports one pipeline " | " connecting  two commands.
+
+- Wildcards:
+    Handles " * " for simple filename pattern matching within directories.
+
+- Error Handling:
+    Invalid commands or arguments.
+    File opening or redirection errors.
+    Invalid pipeline configurations.
+
+Function Descriptions:
+-----------------------------------------------------------------------------------------------------------------------------------
+1. determinMode
+	Determines whether the shell is running in batch mode or interactive mode. return 1 is for batch 	mode 	and return 0 is for interactive mode.
+2. tokenizing:
+	Tokenizes a command string into normal tokens or special tokens like " | ", "<", and ">". Number of 		tokens would be created and fill the token array if provided.
+3. tokenize:
+	Allocates memory for and tokenizes a command string, and then it returns the number of tokens 	created and a filled tokenType array.
+4. readline:
+	Reads a line of input from file descriptor into a buffer, handling partial reads. And then, it returns 1 if a 	line is successfully read, 0 on EOF, and -1 on errors.
+5. findCommand:
+	Searches for the executable file according to a program name in the system's path. It returns 1 if the 	program is found, otherwise it returns 0.
+6. executeCommand:
+	Forks a child process to execute a command using execv. Handles input and output redirection. It 	returns the process ID of the childe process or -1 on failure.
+7. handleCommand:
+	Prepares and executes a single command. Also handle the methods of redirection, wildcard expansion,
+	and arguments. It returns 0 if it success and -1 if it fail to process.
+8. isBuiltinCommand:
+	Executes built-in commands like "cd", "pwd", "which", and "exit". It returns 1 if the command is built in, 	otherwise, it returns 0.
+9. handleLine:
+	Processes a single line of input. Tokenizes the line and determines whether it is a built-in command or a 	pipeline. It also executes the commands or prints error messages as necessary.
+
+
+
+Design Notes:
+-----------------------------------------------------------------------------------------------------------------------------------
+- Redirection:
+Implemented using open() and dup2() to set standard input/output for child processes.
+
+- Pipelines:
+Uses pipe() to connect processes, with error handling for invalid configurations.
+
+- Wildcards:
+Expands tokens containing * by scanning directory contents.
+
+
+Compilation:
+-----------------------------------------------------------------------------------------------------------------------------------
+    make:
+        gcc -o mysh mysh.c
+    interactive mode:
+        ./mysh
+    Batch Mode:
+        ./mysh [script file]
+
+
+Test Cases:
+-----------------------------------------------------------------------------------------------------------------------------------
+test_basic_commands: contains 'echo' commands which print out the following scripts
+
+test_buildin_commands: 
+    pwd - test if it can print out the directory of the current working directory.
+    cd - test if it can changes to one of the subdirectory that is in the current directory.
+    which - locates the directory for the target program.
+    ls - print out all the subdirectory that is in the current directory.
+    exit - terminating the shell and exit.
+
+test_pipe:
+    test if works when use " | " between the two commands "echo" and "grep"
+    test if works when use " | " between the two commands "ls" and " wc"
+
+test_wildcard:
+    test if it can print out all the file that ends with ".txt" 
+
+test_redirection
+    test if the redirection feature in mysh work properly
+    this include input redirection < and output redirection >
+
